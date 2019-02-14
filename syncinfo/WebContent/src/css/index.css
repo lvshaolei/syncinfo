@@ -1,0 +1,62 @@
+* {
+		margin: 0;
+		padding: 0;
+		line-height: 10px;
+		border: 0;
+		color: #009688;
+		font-size: 18px;
+		font-weight: 300;
+		background-image: url(../images/back2.jpg);
+		background-position: center;
+		background-size: cover;
+	}
+	.container {
+		position: absolute;
+		top: 0px;
+		width: 100%;
+		height: 92%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	#login {
+		min-width: 250px;
+		min-height: 300px;
+		width: 33%;
+		height: 300px;
+		background-color: #ffffff;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 6px;
+	}
+	#submit {
+		cursor: pointer;
+		background-color: gainsboro;
+	}
+	#submit:hover {
+		background-color: aquamarine;
+	}
+	#checkNode:hover {
+		background-color: gainsboro;
+	}
+	table {
+		width: 90%;
+		height: 260px;
+	}
+	table td {
+		text-align: center;
+	}
+	input,select {
+		width: 98%;
+		height: 62%;
+		border-radius: 6px;
+	}
+	.code{
+		cursor: pointer;
+		font-family: Arial;
+		font-style: italic;
+		letter-spacing: 3px;
+		font-weight: bolder;
+		border: 0;
+	}
