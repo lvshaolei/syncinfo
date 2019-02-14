@@ -1,6 +1,7 @@
 package xyz.lvsl.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +14,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 import xyz.lvsl.jdbc.JdbcUtil;
 import xyz.lvsl.pojo.User;
 
@@ -30,19 +33,25 @@ public class ActionServlet extends HttpServlet {
 		response.setCharacterEncoding("utf-8");
 		
 		String action = request.getParameter("action");
-		HttpSession se = request.getSession(false);
-		User user = (User)se.getAttribute("UserSession");
+//		HttpSession se = request.getSession(false);
+//		User user = (User)se.getAttribute("UserSession");
+//		PrintWriter out = response.getWriter();
 		
-		if(user == null || "login".equals(action)) {
+		if("login".equals(action)) {
 			String username = request.getParameter("username");
 			String password = request.getParameter("password");
 			String role = request.getParameter("role");
 			System.out.println(username + "\t" + password + "\t" + role);
 			if(this.login(new User(username, password, role))) {
-				
+				JSONArray jsonArray = new JSONArray();
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.put("username", username);
+				jsonObject.put("password", password);
+				jsonArray.add(jsonObject);
+				System.out.println(jsonArray.toString());
 				switch(role) {
 					case "0":	
-						response.sendRedirect("/syncinfo/html/student.jsp");
+						response.sendRedirect("/syncinfo/student.html");
 						break;
 					case "1":	
 						response.sendRedirect("/syncinfo/html/teacher.jsp");
