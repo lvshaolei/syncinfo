@@ -1,4 +1,4 @@
-package xyz.lvsl.jdbc;
+package syncinfo.jdbc;
 
 import java.io.InputStream;
 import java.io.PrintWriter;

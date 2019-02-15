@@ -1,4 +1,4 @@
-package xyz.lvsl.filter;
+package syncinfo.filter;
 
 import java.io.IOException;
 import javax.servlet.Filter;

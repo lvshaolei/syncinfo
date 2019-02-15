@@ -1,4 +1,4 @@
-package xyz.lvsl.servlet;
+package syncinfo.servlet;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,8 +16,10 @@ import javax.servlet.http.HttpSession;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import xyz.lvsl.jdbc.JdbcUtil;
-import xyz.lvsl.pojo.User;
+import sun.security.jgss.LoginConfigImpl;
+import syncinfo.jdbc.JdbcUtil;
+import syncinfo.model.User;
+import syncinfo.service.impl.LoginServiceImpl;
 
 @WebServlet("/ActionServlet")
 public class ActionServlet extends HttpServlet {
@@ -31,7 +33,7 @@ public class ActionServlet extends HttpServlet {
 		response.setContentType("text/html;charset=utf-8");
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("utf-8");
-		
+		LoginServiceImpl login = new LoginServiceImpl();
 		String action = request.getParameter("action");
 //		HttpSession se = request.getSession(false);
 //		User user = (User)se.getAttribute("UserSession");
@@ -42,16 +44,10 @@ public class ActionServlet extends HttpServlet {
 			String password = request.getParameter("password");
 			String role = request.getParameter("role");
 			System.out.println(username + "\t" + password + "\t" + role);
-			if(this.login(new User(username, password, role))) {
-				JSONArray jsonArray = new JSONArray();
-				JSONObject jsonObject = new JSONObject();
-				jsonObject.put("username", username);
-				jsonObject.put("password", password);
-				jsonArray.add(jsonObject);
-				System.out.println(jsonArray.toString());
+			if(login.login(new User(username, password, role))) {
 				switch(role) {
 					case "0":	
-						response.sendRedirect("/syncinfo/student.html");
+						response.sendRedirect("/syncinfo/student.jsp");
 						break;
 					case "1":	
 						response.sendRedirect("/syncinfo/html/teacher.jsp");
@@ -71,26 +67,26 @@ public class ActionServlet extends HttpServlet {
 		doGet(request, response);
 	}
 	
-	private boolean login(User user) {
-		Connection conn = JdbcUtil.getConnection();
-		String sql = "select * from user where username = ? and password = ? and role = ?";
-		try {
-			PreparedStatement pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, user.getUsername());
-			pstmt.setString(2, user.getPassword());
-			pstmt.setString(3, user.getRole());
-			ResultSet resultSet = pstmt.executeQuery();
-			if(resultSet.next()) {
-				User nuser = new User(resultSet.getString("id"), user.getUsername(), user.getPassword(), user.getRole());
-				System.out.println(nuser.getId());
-				JdbcUtil.release(conn, pstmt, resultSet);
-				return true;
-			}
-			JdbcUtil.release(conn, pstmt, resultSet);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
+//	private boolean login(User user) {
+//		Connection conn = JdbcUtil.getConnection();
+//		String sql = "select * from user where username = ? and password = ? and role = ?";
+//		try {
+//			PreparedStatement pstmt = conn.prepareStatement(sql);
+//			pstmt.setString(1, user.getUsername());
+//			pstmt.setString(2, user.getPassword());
+//			pstmt.setString(3, user.getRole());
+//			ResultSet resultSet = pstmt.executeQuery();
+//			if(resultSet.next()) {
+//				User nuser = new User(resultSet.getString("id"), user.getUsername(), user.getPassword(), user.getRole());
+//				System.out.println(nuser.getId());
+//				JdbcUtil.release(conn, pstmt, resultSet);
+//				return true;
+//			}
+//			JdbcUtil.release(conn, pstmt, resultSet);
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		return false;
+//	}
 
 }

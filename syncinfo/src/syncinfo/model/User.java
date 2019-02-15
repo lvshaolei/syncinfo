@@ -1,4 +1,4 @@
-package xyz.lvsl.pojo;
+package syncinfo.model;
 
 import java.io.Serializable;
 

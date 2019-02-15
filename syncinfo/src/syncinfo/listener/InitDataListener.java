@@ -1,8 +1,9 @@
-package xyz.lvsl.listener;
+package syncinfo.listener;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import xyz.lvsl.jdbc.JdbcPool;
+
+import syncinfo.jdbc.JdbcPool;
 
 public class InitDataListener implements ServletContextListener {
 	

@@ -1,4 +1,4 @@
-package xyz.lvsl.util;
+package syncinfo.jdbc;
 
 import redis.clients.jedis.Jedis;
 

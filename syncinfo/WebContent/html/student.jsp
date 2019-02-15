@@ -12,11 +12,6 @@
 <div class="layui-layout layui-layout-admin">
   <div class="layui-header">
     <div class="layui-logo">TXXSXX</div>
-    <ul class="layui-nav layui-layout-left">
-      <li class="layui-nav-item"><a href="">发起事项</a></li>
-      <li class="layui-nav-item"><a href="">待办事项</a></li>
-			<li class="layui-nav-item"><a href="">已办事项</a></li>
-    </ul>
     <ul class="layui-nav layui-layout-right">
       <li class="layui-nav-item">
         <a href="javascript:;">
