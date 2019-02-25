@@ -1,0 +1,133 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:p="http://www.springframework.org/schema/p"  
+	xmlns:sws="http://www.springframework.org/schema/web-services"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/web-services http://www.springframework.org/schema/web-services/web-services-2.0.xsd">
+
+	<!-- 自动扫描且只扫描@Controller -->
+	<context:component-scan base-package="syncinfo" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	    <context:include-filter type="annotation" expression="org.springframework.ws.server.endpoint.annotation.Endpoint" />
+	</context:component-scan>
+	
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<!-- 将StringHttpMessageConverter的默认编码设为UTF-8 -->
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+		    	<constructor-arg value="UTF-8" />
+			</bean>
+  		</mvc:message-converters>
+	</mvc:annotation-driven>
+	
+	<!-- 定义JSP文件的位置 --> 
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+			
+	<!-- 容器默认的DefaultServletHandler处理 所有静态内容与无RequestMapping处理的URL-->	
+	<mvc:default-servlet-handler/>
+	
+	<!-- 定义无需Controller的url<->view直接映射 -->
+<!-- 	<mvc:view-controller path="/main" view-name="/system/index"/> -->
+	
+	<!-- 将Controller抛出的异常转到特定View, 保持SiteMesh的装饰效果 -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">  
+		<property name="exceptionMappings">  
+			<props>
+				<prop key="org.apache.shiro.authz.UnauthorizedException">error/403</prop>
+				<prop key="java.lang.Throwable">error/500</prop>
+            </props>  
+		</property>  
+    </bean> 
+    
+	<!-- SpringMVC上传文件时，需要配置MultipartResolver处理器 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" />
+		<!-- 指定所上传文件的总大小不能超过10485760000B。注意maxUploadSize属性的限制不是针对单个文件，而是所有文件的容量之和 -->
+		<property name="maxUploadSize" value="10485760000"></property>
+		<property name="maxInMemorySize" value="40960"></property>
+	</bean>  
+    
+    <!-- 自定义拦截链配置 -->
+    <!-- <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/*/*/create"/>
+            <mvc:mapping path="/*/*/delete/*"/>
+            <mvc:mapping path="/*/*/update"/>
+            <bean class="com.tianyu.jety.system.interceptor.LogInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors> -->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <mvc:exclude-mapping path="/*Service/"/>
+            <bean class="syncinfo.interceptor.RequestMappingInterceptor"/>
+        </mvc:interceptor>
+    </mvc:interceptors> 
+	 <!-- 启用shrio授权注解拦截方式 -->
+    <aop:config proxy-target-class="true"></aop:config>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
+
+    <!-- Spring-WS -->
+<!-- 		<sws:static-wsdl id="syncService" location="WEB-INF/syncService.wsdl"/> -->    
+    
+<!--     <sws:dynamic-wsdl id="syncService" -->
+<!-- 	    portTypeName="syncPort" -->
+<!-- 	    locationUri="/syncService/"> -->
+<!-- 	    <sws:xsd location="WEB-INF/sync.xsd" /> -->
+<!-- 	</sws:dynamic-wsdl> -->
+	
+	<!-- 
+		<sws:interceptors>
+        <bean class="org.springframework.ws.server.endpoint.interceptor.PayloadLoggingInterceptor"/>
+        <bean class="org.springframework.ws.soap.server.endpoint.interceptor.PayloadValidatingInterceptor">
+            <property name="schema" value="/WEB-INF/sync.xsd"/>
+		    <property name="validateRequest" value="true"/>
+		    <property name="validateResponse" value="true"/>
+        </bean>
+  
+   </sws:interceptors>
+	 -->
+	
+   <!-- <bean id="unmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller"
+          p:contextPath="syncinfo.domain" /> -->
+   
+<!--    <sws:annotation-driven unmarshaller="unmarshaller"/> -->
+   
+   <!-- <bean class="cn.com.infosec.ra.system.webservice.exception.Handlers.CustomSoapExceptionResolver"></bean> -->
+
+   <bean id="messageFactory" class="org.springframework.ws.soap.saaj.SaajSoapMessageFactory"/>
+
+    <bean class="org.springframework.ws.transport.http.WebServiceMessageReceiverHandlerAdapter" p:messageFactory-ref="messageFactory"/>
+
+   <bean id="messageDispatcher" class="org.springframework.ws.soap.server.SoapMessageDispatcher"/>
+   
+   <bean id="loginController" class="syncinfo.controller.LoginController" ></bean>  
+   <bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+        <property name="mappings">
+        	<value>
+        	/login = loginController
+        	</value>
+        </property>
+    </bean>
+    
+   <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter"/>
+   
+   <bean class="org.springframework.ws.transport.http.WsdlDefinitionHandlerAdapter"/>
+   
+   <bean class="org.springframework.ws.soap.server.endpoint.SimpleSoapExceptionResolver"/>
+   
+</beans>
